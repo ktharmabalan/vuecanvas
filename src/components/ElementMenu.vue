@@ -1,6 +1,11 @@
 <template>
   <div id="element-menu-container">
-    <span v-for="(element, eId) in elements" :key="eId" @click="selectElement(element)">{{ element.substring(0, 1) }}</span>
+    <span
+      v-for="(element, eId) in elements"
+      :key="eId"
+      :class="{ active: selected === element }"
+      @click="$emit('select-element', element)"
+    >{{ element.substring(0, 1).toUpperCase() }}</span>
   </div>
 </template>
 
@@ -9,15 +14,13 @@ import Vue from "vue";
 
 export default Vue.extend({
   name: "ElementMenu",
+  props: {
+    selected: String
+  },
   data() {
     return {
-      elements: ['square', 'circle', 'polygon']
+      elements: ["square", "circle", "polygon", "line"]
     };
-  },
-  methods: {
-    selectElement(element: string) {
-      console.log(element);
-    }
   }
 });
 </script>
@@ -43,7 +46,8 @@ export default Vue.extend({
   padding: 15px 10px;
   font-weight: 600;
 }
-#element-menu-container > span:hover {
+#element-menu-container > span:hover,
+#element-menu-container > span.active {
   cursor: pointer;
   background-color: #e6e6e6;
 }

@@ -1,8 +1,8 @@
 // Reference: https://www.youtube.com/channel/UCF6F8LdCSWlRwQm_hfA2bcQ
 import {
-  CanvasCircleElement,
+  CircleElement,
   Point,
-  CanvasSquareElement,
+  SquareElement,
 } from './element';
 
 // take value within min-max range, and represent its position by a number between 0 and 1
@@ -39,8 +39,8 @@ const inRange = (value: number, min: number, max: number) => {
 
 // caculate distance between two points
 const pointDistance = (p1: Point, p2: Point) => {
-  const dx = p2.x.valueOf() - p1.x.valueOf();
-  const dy = p2.y.valueOf() - p1.y.valueOf();
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
   return Math.sqrt(dx * dx + dy * dy);
 };
 
@@ -53,56 +53,56 @@ const pointDistance = (p1: Point, p2: Point) => {
 
 // caculate distance between two points
 const circleDistance = (
-  d1: CanvasCircleElement,
-  d2: CanvasCircleElement,
+  d1: CircleElement,
+  d2: CircleElement,
 ): number => {
-  const dx = d1.point1.x.valueOf() - d2.point1.x.valueOf();
-  const dy = d1.point1.y.valueOf() - d2.point1.y.valueOf();
+  const dx = d1.point1.x - d2.point1.x;
+  const dy = d1.point1.y - d2.point1.y;
   return Math.sqrt(dx * dx + dy * dy);
 };
 
 const rangeIntersect = (
-  min1: Number,
-  min2: Number,
-  max1: Number,
-  max2: Number,
+  min1: number,
+  min2: number,
+  max1: number,
+  max2: number,
 ): boolean => {
   return (
-    Math.max(min1.valueOf(), max1.valueOf()) >=
-      Math.min(min2.valueOf(), max2.valueOf()) &&
-    Math.min(min1.valueOf(), max1.valueOf()) <=
-      Math.max(min2.valueOf(), max2.valueOf())
+    Math.max(min1, max1) >=
+    Math.min(min2, max2) &&
+    Math.min(min1, max1) <=
+    Math.max(min2, max2)
   );
 };
 
 const circleCollision = (
-  c1: CanvasCircleElement,
-  c2: CanvasCircleElement,
+  c1: CircleElement,
+  c2: CircleElement,
 ): boolean => {
-  return circleDistance(c1, c2) <= c1.radius.valueOf() + c2.radius.valueOf();
+  return circleDistance(c1, c2) <= c1.radius + c2.radius;
 };
 
 const circlePointCollision = (
   point: Point,
-  circle: CanvasCircleElement,
+  circle: CircleElement,
 ): boolean => {
   return pointDistance(point, circle.point1) < circle.radius;
 };
 
 const squarePointCollision = (
   point: Point,
-  square: CanvasSquareElement,
+  square: SquareElement,
 ): boolean => {
   return (
     inRange(
-      point.x.valueOf(),
-      square.point1.x.valueOf(),
-      square.point1.x.valueOf() + square.minWidth.valueOf(),
+      point.x,
+      square.point1.x,
+      square.point1.x + square.minWidth,
     ) &&
     inRange(
-      point.y.valueOf(),
-      square.point1.y.valueOf(),
-      square.point1.y.valueOf() + square.minHeight.valueOf(),
+      point.y,
+      square.point1.y,
+      square.point1.y + square.minHeight,
     )
   );
 };
@@ -110,34 +110,34 @@ const squarePointCollision = (
 const boundingPointCollision = (point: Point, square: Point[]): boolean => {
   return (
     inRange(
-      point.x.valueOf(),
-      square[0].x.valueOf(),
-      square[0].x.valueOf() + square[1].x.valueOf(),
+      point.x,
+      square[0].x,
+      square[1].x,
     ) &&
     inRange(
-      point.y.valueOf(),
-      square[0].y.valueOf(),
-      square[0].y.valueOf() + square[1].y.valueOf(),
+      point.y,
+      square[0].y,
+      square[1].y,
     )
   );
 };
 
 const squareSquareCollision = (
-  square1: CanvasSquareElement,
-  square2: CanvasSquareElement,
+  square1: SquareElement,
+  square2: SquareElement,
 ): boolean => {
   return (
     rangeIntersect(
-      square1.point1.x.valueOf(),
-      square1.point1.x.valueOf() + square1.minWidth.valueOf(),
-      square2.point1.x.valueOf(),
-      square2.point1.x.valueOf() + square2.minWidth.valueOf(),
+      square1.point1.x,
+      square1.point1.x + square1.minWidth,
+      square2.point1.x,
+      square2.point1.x + square2.minWidth,
     ) &&
     rangeIntersect(
-      square1.point1.y.valueOf(),
-      square1.point1.y.valueOf() + square1.minHeight.valueOf(),
-      square2.point1.y.valueOf(),
-      square2.point1.y.valueOf() + square2.minHeight.valueOf(),
+      square1.point1.y,
+      square1.point1.y + square1.minHeight,
+      square2.point1.y,
+      square2.point1.y + square2.minHeight,
     )
   );
 };

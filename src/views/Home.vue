@@ -1,13 +1,17 @@
 <template>
   <div id="main-container">
-    <Canvas />
+    <Canvas
+      :insert-element="insertElement"
+      @element-inserted="elementInserted"
+      @update-screen-data="updatedCavanasScreen"
+    />
 
     <div class="action-container" :class="{ active: toggled }">
       <span class="toggler" @click="toggle()">T</span>
     </div>
 
-    <Properties :toggled="toggled" @toggle="toggle" />
-    <ElementMenu />
+    <Properties :toggled="toggled" @toggle="toggle" :screen-data="screenData"/>
+    <ElementMenu @select-element="selectElement" :selected="insertElement"/>
   </div>
 </template>
 
@@ -16,17 +20,29 @@ import Vue from "vue";
 import Properties from "@/components/Properties.vue";
 import Canvas from "@/components/Canvas.vue";
 import ElementMenu from "@/components/ElementMenu.vue";
+import { CanvasScreen } from "@/libs/element";
 
 export default Vue.extend({
   name: "home",
   data() {
     return {
-      toggled: false
+      toggled: false,
+      insertElement: "",
+      screenData: null as CanvasScreen | null
     };
   },
   methods: {
     toggle() {
       this.toggled = !this.toggled;
+    },
+    selectElement(element: string) {
+      this.insertElement = element;
+    },
+    elementInserted() {
+      this.insertElement = "";
+    },
+    updatedCavanasScreen(screen: CanvasScreen | null) {
+      this.screenData = screen;
     }
   },
   components: {
