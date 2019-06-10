@@ -91,18 +91,18 @@ const circlePointCollision = (
 
 const squarePointCollision = (
   point: Point,
-  square: SquareElement,
+  square: SquareElement
 ): boolean => {
   return (
     inRange(
       point.x,
       square.point1.x,
-      square.point1.x + square.minWidth,
+      square.point1.x + square.minWidth
     ) &&
     inRange(
       point.y,
       square.point1.y,
-      square.point1.y + square.minHeight,
+      square.point1.y + square.minHeight
     )
   );
 };
@@ -112,32 +112,32 @@ const boundingPointCollision = (point: Point, square: Point[]): boolean => {
     inRange(
       point.x,
       square[0].x,
-      square[1].x,
+      square[1].x
     ) &&
     inRange(
       point.y,
       square[0].y,
-      square[1].y,
+      square[1].y
     )
   );
 };
 
 const squareSquareCollision = (
   square1: SquareElement,
-  square2: SquareElement,
+  square2: SquareElement
 ): boolean => {
   return (
     rangeIntersect(
       square1.point1.x,
       square1.point1.x + square1.minWidth,
       square2.point1.x,
-      square2.point1.x + square2.minWidth,
+      square2.point1.x + square2.minWidth
     ) &&
     rangeIntersect(
       square1.point1.y,
       square1.point1.y + square1.minHeight,
       square2.point1.y,
-      square2.point1.y + square2.minHeight,
+      square2.point1.y + square2.minHeight
     )
   );
 };
@@ -148,5 +148,5 @@ export {
   circleCollision,
   circlePointCollision,
   squarePointCollision,
-  boundingPointCollision,
+  boundingPointCollision
 };

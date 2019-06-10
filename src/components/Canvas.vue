@@ -1,9 +1,8 @@
 <template>
-  <div id="canvas-container" ref="canvasContainer">
+  <div id="canvas-container">
     <!-- :style="{ width: screenWidth+'px', height: screenHeight+'px'}" -->
     <canvas
       id="canvas"
-      ref="canvas"
       @mousedown="elMouseDown"
       @mouseup="elMouseUp"
       @mousemove="elMouseMove"
@@ -17,6 +16,8 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { mapState, mapGetters, mapMutations } from "vuex";
+
 import {
   CanvasElement,
   CanvasScreen,
@@ -70,7 +71,7 @@ export default Vue.extend({
         y: number;
       } | null,
       rectWidth: 100,
-      screen: null as CanvasScreen | null,
+      // screen: null as CanvasScreen | null,
       screenWidth: 0,
       screenHeight: 0,
       selecting: [] as CanvasElement[],
@@ -86,6 +87,7 @@ export default Vue.extend({
     this.init();
   },
   methods: {
+    ...mapMutations(["setScreen"]),
     init() {
       this.keyToListen = Object.values(this.keyMap);
 
@@ -117,25 +119,41 @@ export default Vue.extend({
       this.colliding = [];
       this.selecting = [];
 
-      this.screen = new CanvasScreen(
-        ElementType.Screen,
-        new Point(0, 0),
-        this.screenWidth,
-        this.screenHeight
+      // this.screen = new CanvasScreen(
+      //   ElementType.Screen,
+      //   new Point(0, 0),
+      //   this.screenWidth,
+      //   this.screenHeight
+      // );
+
+      this.setScreen(
+        new CanvasScreen(
+          ElementType.Screen,
+          new Point(0, 0),
+          this.screenWidth,
+          this.screenHeight
+        )
       );
+
+      // console.log(this.screen);
 
       // Polygon
       this.screen.addChild(
         new PolygonElement(
           ElementType.Polygon,
           new Point(this.screen.point1.x + 500, this.screen.point1.x + 500),
-          3
+          20
         )
       );
+
       this.screen.addChild(
-        new PolygonElement(ElementType.Polygon, new Point(700, 700), 4)
+        new SquareElement(ElementType.Square, new Point(700, 400), 200, 200)
       );
-      // console.log(this.screen.children[1]);
+
+      this.screen.addChild(
+        new CircleElement(ElementType.Circle, new Point(300, 400), 100)
+      );
+
       this.render();
     },
     elMouseDown(event: MouseEvent) {
@@ -250,7 +268,7 @@ export default Vue.extend({
         // console.log(this.drawPoint, { x: x, y: y });
         if (this.selectRect === null) {
           this.selectRect = new SelectSquareElement(
-            ElementType.Square,
+            ElementType.Select,
             this.drawPoint,
             minWidth,
             minHeight
@@ -383,7 +401,6 @@ export default Vue.extend({
           }
 
           if (this.collisionResult) {
-            // console.log(this.collidedElement.offset);
             let movement = MoveType.None;
             let dx: number = 0;
             let dy: number = 0;
@@ -429,7 +446,6 @@ export default Vue.extend({
             // collidedElement.updateOffset(dx * xOffset, dy * yOffset);
             // // console.log(moveMap[movement], xOffset * dx, yOffset * dy);
           } else {
-            console.log("here");
             // let x: number = 0;
             // let y: number = 0;
             // if (this.offset) {
@@ -477,8 +493,15 @@ export default Vue.extend({
           false,
           true,
           null,
-          this.mouseDownPoint
+          this.mouseDownPoint,
+          this.selecting
         );
+
+        this.selecting = selecting;
+        // , selecting
+        // if (this.selecting.length) {
+        //   this.selecting = this.selecting.concat(this.selecting);
+        // }
 
         this.dragSelect = [];
 
@@ -499,22 +522,28 @@ export default Vue.extend({
           }
 
           this.screen.children.forEach(_child => {
-            if (_child.type === ElementType.Square) {
-              const child = <SquareElement>_child;
-              let cMinX = child!.point1.x;
-              let cMinY = child!.point1.y;
-              let cMaxX = cMinX + child!.minWidth;
-              let cMaxY = cMinY + child!.minHeight;
+            const child = <CanvasElement>_child;
+            if (child.boundingBox.length) {
+              let cMinX = child!.boundingBox[0].x;
+              let cMinY = child!.boundingBox[0].y;
+              let cMaxX = child!.boundingBox[1].y;
+              let cMaxY = child!.boundingBox[1].y;
 
-              if (child!.minWidth < 0) {
-                cMinX = child!.minWidth + cMinX;
-                cMaxX = child!.point1.x;
-              }
+              // const child = <SquareElement>_child;
+              // let cMinX = child!.point1.x;
+              // let cMinY = child!.point1.y;
+              // let cMaxX = cMinX + child!.minWidth;
+              // let cMaxY = cMinY + child!.minHeight;
 
-              if (child!.minHeight < 0) {
-                cMinY = child!.minHeight + cMinY;
-                cMaxY = child!.point1.y;
-              }
+              // if (child!.minWidth < 0) {
+              //   cMinX = child!.minWidth + cMinX;
+              //   cMaxX = child!.point1.x;
+              // }
+
+              // if (child!.minHeight < 0) {
+              //   cMinY = child!.minHeight + cMinY;
+              //   cMaxY = child!.point1.y;
+              // }
 
               if (
                 minX <= cMinX &&
@@ -539,43 +568,7 @@ export default Vue.extend({
 
         // insert element
         if (this.insertElement && this.mouseDownPoint) {
-          this.$emit("element-inserted");
-          // console.log(this.insertElement);
-          if (this.insertElement === "square") {
-            this.screen.addChild(
-              new SquareElement(
-                ElementType.Square,
-                new Point(this.mouseDownPoint.x, this.mouseDownPoint.y),
-                this.rectWidth,
-                this.rectWidth
-              )
-            );
-          } else if (this.insertElement === "circle") {
-            this.screen.addChild(
-              new CircleElement(
-                ElementType.Circle,
-                new Point(this.mouseDownPoint.x, this.mouseDownPoint.y),
-                this.rectWidth / 2
-              )
-            );
-          } else if (this.insertElement === "polygon") {
-            this.screen.addChild(
-              new PolygonElement(
-                ElementType.Polygon,
-                new Point(this.mouseDownPoint.x, this.mouseDownPoint.y),
-                5
-              )
-            );
-          } else if (this.insertElement === "line") {
-            const line = new LineElement(
-              ElementType.Line,
-              new Point(this.mouseDownPoint.x, this.mouseDownPoint.y)
-            );
-            this.screen.addChild(line);
-            line.addPoint(
-              new Point(this.mouseDownPoint.x + 100, this.mouseDownPoint.y)
-            );
-          }
+          this.insertElementToScreen();
         }
 
         // if (maxDepth !== 0) {
@@ -653,6 +646,47 @@ export default Vue.extend({
         this.canvas.width = innerWidth;
         this.canvas.height = innerHeight;
       }
+    },
+    insertElementToScreen() {
+      if (this.screen && this.mouseDownPoint) {
+        this.$emit("element-inserted");
+        // console.log(this.insertElement);
+        if (this.insertElement === "square") {
+          this.screen.addChild(
+            new SquareElement(
+              ElementType.Square,
+              new Point(this.mouseDownPoint.x, this.mouseDownPoint.y),
+              this.rectWidth,
+              this.rectWidth
+            )
+          );
+        } else if (this.insertElement === "circle") {
+          this.screen.addChild(
+            new CircleElement(
+              ElementType.Circle,
+              new Point(this.mouseDownPoint.x, this.mouseDownPoint.y),
+              this.rectWidth / 2
+            )
+          );
+        } else if (this.insertElement === "polygon") {
+          this.screen.addChild(
+            new PolygonElement(
+              ElementType.Polygon,
+              new Point(this.mouseDownPoint.x, this.mouseDownPoint.y),
+              5
+            )
+          );
+        } else if (this.insertElement === "line") {
+          const line = new LineElement(
+            ElementType.Line,
+            new Point(this.mouseDownPoint.x, this.mouseDownPoint.y)
+          );
+          this.screen.addChild(line);
+          line.addPoint(
+            new Point(this.mouseDownPoint.x + 100, this.mouseDownPoint.y)
+          );
+        }
+      }
     }
   },
   beforeDestroy() {
@@ -661,15 +695,18 @@ export default Vue.extend({
     window.removeEventListener("keyup", this.elKeyUp);
     window.removeEventListener("mouseup", this.elWindowMouseUp);
   },
-  watch: {
-    screen: {
-      handler() {
-        this.$emit("update-screen-data", this.screen);
-      },
-      deep: true,
-      immediate: true
-    }
+  computed: {
+    ...mapGetters(["screen"])
   }
+  // watch: {
+  //   screen: {
+  //     handler() {
+  //       this.$emit("update-screen-data", this.screen);
+  //     },
+  //     deep: true,
+  //     immediate: true
+  //   }
+  // }
 });
 </script>
 

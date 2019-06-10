@@ -13,6 +13,7 @@ enum ElementType {
   Line,
   Reticle,
   Screen,
+  Select,
 }
 
 enum MoveType {
@@ -26,6 +27,9 @@ enum MoveType {
   Left,
   UpLeft,
 }
+
+const points = [3, 4, 5, 6, 7, 8, 9, 10, 11];
+const angles = [30, 45, 198, 30, 13, 22, 30, 36, 41];
 
 const drawMini = true;
 const drawBoundSquare = true;
@@ -135,18 +139,16 @@ class CanvasElement implements CanvasInterface {
   checkCollision(target: Point | CanvasElement): Boolean {
     let colliding = false;
     if (target instanceof Point) {
-      if (this instanceof BaseSquareElement) {
-        colliding = squarePointCollision(target, this);
-      } else if (this instanceof CircleElement) {
-        colliding = circlePointCollision(target, this);
-      } else if (this instanceof PolygonElement) {
-        colliding = boundingPointCollision(target, this.boundingBox);
-        if (colliding) {
-          console.log('colliding');
-        }
-        // } else if (this instanceof LineElement) {
-        //   colliding = boundingPointCollision(target, this.boundingBox);
-      }
+      colliding = boundingPointCollision(target, this.boundingBox);
+      // if (this instanceof BaseSquareElement) {
+      //   colliding = squarePointCollision(target, this);
+      // } else if (this instanceof CircleElement) {
+      //   colliding = circlePointCollision(target, this);
+      // } else if (this instanceof PolygonElement) {
+      //   colliding = boundingPointCollision(target, this.boundingBox);
+      //   // } else if (this instanceof LineElement) {
+      //   //   colliding = boundingPointCollision(target, this.boundingBox);
+      // }
     }
     return colliding;
   }
@@ -223,10 +225,7 @@ class PolygonElement extends CanvasElement {
     // else if (numPoints > 360) numPoints = 360;
 
     // let numPoints = 3;
-    const points = [3, 4, 5, 6, 7, 8, 9, 10, 11];
-    const angles = [30, 45, 198, 30, 13, 22, 30, 36, 41];
-    const polygonAngle = angles[points.indexOf(numPoint)]; // 0-90
-    // 3 = 
+    const polygonAngle = angles[points.indexOf(numPoint)] || 0; // 0-90
     this.pointsList = [];
 
     let minWidth = 0;
@@ -303,85 +302,125 @@ class PolygonElement extends CanvasElement {
     context.closePath();
     context.stroke();
 
-    if (colliding.includes(this)) {
-      // if (selecting.includes(this)) {
+    if (selecting.length === 1 && selecting.includes(this)) {
       super.drawBounding(context, offset);
     }
     super.render(context, offset, colliding, selecting);
   }
 
-  checkCollision(target: Point | CanvasElement): Boolean {
-    let collided = super.checkCollision(target);
-    // console.log(target, this);
-    if (collided) {
-      const topLeft = { x: this.boundingBox[0].x, y: this.boundingBox[0].y };
-      const topRight = { x: this.boundingBox[1].x, y: this.boundingBox[0].y };
-      const bottomLeft = { x: this.boundingBox[0].x, y: this.boundingBox[1].y };
-      const bottomRight = {
-        x: this.boundingBox[1].x,
-        y: this.boundingBox[1].y,
-      };
+  updatePoint(x: number, y: number): void {
+    this.point1.x += x;
+    this.point1.y += y;
+    const numPoint = this.numPoints;
+    const width = this.width;
+    const polygonAngle = angles[points.indexOf(numPoint)] || 0; // 0-90
+    this.pointsList = [];
+    let minX: number | null = null;
+    let minY: number | null = null;
+    let maxX: number | null = null;
+    let maxY: number | null = null;
 
-      const middleLeft = {
-        x: this.boundingBox[0].x,
-        y: (this.boundingBox[0].y + this.boundingBox[1].y) / 2,
-      };
-      const middleRight = {
-        x: this.boundingBox[1].x,
-        y: (this.boundingBox[0].y + this.boundingBox[1].y) / 2,
-      };
-      const topCenter = {
-        x: (this.boundingBox[0].x + this.boundingBox[1].x) / 2,
-        y: this.boundingBox[0].y,
-      };
-      const bottomCenter = {
-        x: (this.boundingBox[0].x + this.boundingBox[1].x) / 2,
-        y: this.boundingBox[1].y,
-      };
+    let _x = 0;
+    let _y = 0;
+    let angle = polygonAngle * (Math.PI / 180);
 
-      const points = [{ x: topLeft.x, y: topLeft.y },
-      { x: topRight.x, y: topRight.y },
-      { x: bottomLeft.x, y: bottomLeft.y },
-      { x: bottomRight.x, y: bottomRight.y },
-      { x: middleLeft.x, y: middleLeft.y },
-      { x: middleRight.x, y: middleRight.y },
-      { x: topCenter.x, y: topCenter.y },
-      { x: bottomCenter.x, y: bottomCenter.y }]
+    for (let index = 0; index < numPoint; index++) {
+      _x = width * Math.cos(angle);
+      _y = width * Math.sin(angle);
+      const coord: Point = new Point(_x, _y);
+      this.pointsList.push(coord);
+      angle += (2 * Math.PI) / numPoint;
 
-      let childCollided = false;
-      for (let index = 0; index < points.length; index++) {
-        let point = points[index];
-        childCollided = pointDistance(target as Point, point) < (smallBoxSize / 2);
-        if (childCollided) {
-          console.log('collided with', index);
-          // context.strokeStyle = "#a9a9a9";
-          // context.beginPath();
-          // context.arc(x + offset.x, y + offset.y, smallBoxSize / 2, 0, Math.PI * 2, false);
-          // context.stroke();
-          // context.fillStyle = '#FFF';
-          // // context.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
-          // context.fill();
-          break;
-        }
-      }
+      if (minX === null || _x < minX) minX = _x;
+      if (minX === null || _x < minX) minX = _x;
+      if (maxX === null || _x > maxX) maxX = _x;
+      if (maxX === null || _x > maxX) maxX = _x;
 
-
-
-      // let collided = false;
-      // let point = this.point1;
-      // collided = pointDistance(target as Point, point) < (smallBoxSize / 2);
-      // if (!collided) {
-      //   for (let index = 0; index < this.points.length; index++) {
-      //     point = this.points[index];
-      //     collided = pointDistance(target as Point, point) < (smallBoxSize / 2);
-      //     if (collided) {
-      //       break;
-      //     }
-      //   }
-      // }
+      if (minY === null || _y < minY) minY = _y;
+      if (minY === null || _y < minY) minY = _y;
+      if (maxY === null || _y > maxY) maxY = _y;
+      if (maxY === null || _y > maxY) maxY = _y;
     }
-    return collided;
+
+    if (minX && minY && maxX && maxY) {
+      this.boundingBox = [
+        new Point(this.point1.x + minX, this.point1.y + minY),
+        new Point(this.point1.x + maxX, this.point1.y + maxY),
+      ];
+    }
   }
+
+  // checkCollision(target: Point | CanvasElement): Boolean {
+  //   let collided = super.checkCollision(target);
+  //   // console.log(target, this);
+  //   if (collided) {
+  //     const topLeft = { x: this.boundingBox[0].x, y: this.boundingBox[0].y };
+  //     const topRight = { x: this.boundingBox[1].x, y: this.boundingBox[0].y };
+  //     const bottomLeft = { x: this.boundingBox[0].x, y: this.boundingBox[1].y };
+  //     const bottomRight = {
+  //       x: this.boundingBox[1].x,
+  //       y: this.boundingBox[1].y,
+  //     };
+
+  //     const middleLeft = {
+  //       x: this.boundingBox[0].x,
+  //       y: (this.boundingBox[0].y + this.boundingBox[1].y) / 2,
+  //     };
+  //     const middleRight = {
+  //       x: this.boundingBox[1].x,
+  //       y: (this.boundingBox[0].y + this.boundingBox[1].y) / 2,
+  //     };
+  //     const topCenter = {
+  //       x: (this.boundingBox[0].x + this.boundingBox[1].x) / 2,
+  //       y: this.boundingBox[0].y,
+  //     };
+  //     const bottomCenter = {
+  //       x: (this.boundingBox[0].x + this.boundingBox[1].x) / 2,
+  //       y: this.boundingBox[1].y,
+  //     };
+
+  //     const points = [{ x: topLeft.x, y: topLeft.y },
+  //     { x: topRight.x, y: topRight.y },
+  //     { x: bottomLeft.x, y: bottomLeft.y },
+  //     { x: bottomRight.x, y: bottomRight.y },
+  //     { x: middleLeft.x, y: middleLeft.y },
+  //     { x: middleRight.x, y: middleRight.y },
+  //     { x: topCenter.x, y: topCenter.y },
+  //     { x: bottomCenter.x, y: bottomCenter.y }]
+
+  //     let childCollided = false;
+  //     for (let index = 0; index < points.length; index++) {
+  //       let point = points[index];
+  //       childCollided = pointDistance(target as Point, point) < (smallBoxSize / 2);
+  //       if (childCollided) {
+  //         console.log('collided with', index);
+  //         // context.strokeStyle = "#a9a9a9";
+  //         // context.beginPath();
+  //         // context.arc(x + offset.x, y + offset.y, smallBoxSize / 2, 0, Math.PI * 2, false);
+  //         // context.stroke();
+  //         // context.fillStyle = '#FFF';
+  //         // // context.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+  //         // context.fill();
+  //         break;
+  //       }
+  //     }
+
+
+  //     // let collided = false;
+  //     // let point = this.point1;
+  //     // collided = pointDistance(target as Point, point) < (smallBoxSize / 2);
+  //     // if (!collided) {
+  //     //   for (let index = 0; index < this.points.length; index++) {
+  //     //     point = this.points[index];
+  //     //     collided = pointDistance(target as Point, point) < (smallBoxSize / 2);
+  //     //     if (collided) {
+  //     //       break;
+  //     //     }
+  //     //   }
+  //     // }
+  //   }
+  //   return collided;
+  // }
 }
 
 class BaseSquareElement extends CanvasElement {
@@ -468,29 +507,16 @@ class SquareElement extends BaseSquareElement {
     colliding: CanvasElement[],
     selecting: CanvasElement[],
   ): void {
-    // context.beginPath();
-    // context.moveTo(this.point1.x, this.point1.y);
-    // context.lineTo(this.point2.x, this.point1.y);
-    // context.lineTo(this.point2.x, this.point2.y);
-    // context.lineTo(this.point1.x, this.point2.y);
-    // context.lineTo(this.point1.x, this.point1.y);
     context.lineWidth = 3;
     context.strokeStyle = '#1a1a1a';
-    // context.stroke();
     context.fillStyle = 'rgba(255, 255, 255, 0)';
-    // context.fillRect(this.point1.x, this.point1.y, pointDistance(this.point1, this.point2), pointDistance(this.point1, this.point2));
 
-    // if (this.isSelected) {
-    if (selecting.includes(this)) {
-      context.strokeStyle = 'blue';
-      // context.fillStyle = 'blue';
-      // context.fillRect(this.point1.x, this.point1.y, pointDistance(this.point1, this.point2), pointDistance(this.point1, this.point2));
-    }
-    // context.lineWidth = 1;
-    // context.stroke();
-    // if (colliding.includes(this)) {
-    //   context.fillStyle = 'white';
-    // }
+    context.strokeRect(
+      this.point1.x + offset.x,
+      this.point1.y + offset.y,
+      this.minWidth,
+      this.minHeight,
+    );
 
     // context.fillRect(
     //   this.point1.x + offset.x,
@@ -501,29 +527,9 @@ class SquareElement extends BaseSquareElement {
     //   this.minHeight,
     // );
 
-    context.strokeRect(
-      this.point1.x + offset.x,
-      this.point1.y + offset.y,
-      this.minWidth,
-      this.minHeight,
-    );
-
-    // if (drawBoundSquare) {
-    //   context.lineWidth = 1;
-    //   context.strokeStyle = 'blue';
-    //   context.strokeRect(
-    //     this.point1.x,
-    //     this.point1.y,
-    //     this.minWidth,
-    //     this.minHeight,
-    //   );
-    // }
-    if (selecting.includes(this)) {
+    if (selecting.length === 1 && selecting.includes(this)) {
       super.drawBounding(context, offset);
     }
-
-    // context.fillRect(this.point1.x, this.point1.y, pointDistance(this.point1, this.point2), pointDistance(this.point1, this.point2));
-    // context.strokeRect(this.point1.x, this.point1.y, pointDistance(this.point1, this.point2), pointDistance(this.point1, this.point2));
 
     super.render(context, offset, colliding, selecting);
   }
@@ -723,7 +729,7 @@ class CircleElement extends CanvasElement {
     // context.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
     // context.fill();
 
-    if (selecting.includes(this)) {
+    if (selecting.length === 1 && selecting.includes(this)) {
       super.drawBounding(context, offset);
     }
     super.render(context, offset, colliding, selecting);
@@ -760,12 +766,13 @@ const collisionCheck = (
   selectTop: Boolean = false,
   top: CanvasElement | null,
   clickPoint: Point | null,
+  selecting: CanvasElement[]
 ): [CanvasElement[], CanvasElement[]] => {
   const children = element.children;
   const childrenCount = children.length;
 
   let colliding: CanvasElement[] = [];
-  let selecting: CanvasElement[] = [];
+  // let selecting: CanvasElement[] = [];
 
   if (selectTop) {
     for (let index = childrenCount - 1; index >= 0; index--) {
@@ -803,6 +810,7 @@ const collisionCheck = (
         selectTop,
         top,
         clickPoint,
+        selecting,
       );
       colliding = colliding.concat(colliding1);
       selecting = selecting.concat(selecting1);
@@ -844,8 +852,7 @@ const collisionOnlyCheck = (
     if (
       child.checkCollision(clickPoint) &&
       colliding === null &&
-      [ElementType.Square, ElementType.Circle].includes(child.type) &&
-      child.type !== ElementType.Screen
+      ![ElementType.Screen, ElementType.Select].includes(child.type)
     ) {
       const cElement: CanvasElement = child;
       x = clickPoint.x - cElement.point1.x;
@@ -860,7 +867,6 @@ const collisionOnlyCheck = (
 };
 
 const drawBoundingBox = (selecting: CanvasElement[]): SelectSquareElement | null => {
-  // console.log('draw', selecting.length, selecting);
   if (selecting.length) {
     // console.log('inside');
     let minX: number | null = null;
@@ -872,7 +878,7 @@ const drawBoundingBox = (selecting: CanvasElement[]): SelectSquareElement | null
     let height = 0;
 
     selecting.forEach((element) => {
-      if ([ElementType.Square, ElementType.Circle].includes(element.type)) {
+      if (![ElementType.Screen, ElementType.Select].includes(element.type)) {
         const child = element;
         const [point1, point2] = child.boundingBox;
         if (minX === null || point1.x < minX) minX = point1.x;

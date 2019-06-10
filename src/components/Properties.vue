@@ -2,11 +2,38 @@
   <div id="properties-container" :class="{ active: toggled }">
     <div class="content-container">
       <span>Properties</span>
-      <div v-if="screenData" class="properties-content">
-        <div v-for="(child, cIdx) in screenData.children" :key="cIdx" class="line-item">
+      <div v-if="screen" class="properties-content">
+        <div
+          v-for="(child, cIdx) in screen.children"
+          :key="cIdx"
+          class="line-item"
+          @click="childClicked(child)"
+        >
           <div>{{ elementTypes[child.type] }}</div>
-          <div>{{ child.boundingBox[0] }}</div>
-          <div>{{ child.boundingBox[1] }}</div>
+          <div v-show="elementTypes[child.type] === 'Polygon'">
+            <input type="number" v-model="child.numPoints">
+          </div>
+          <!-- <div>
+            <p>Bounding box</p>
+            <div>
+              <p>top left</p>
+              <input type="number" v-model="child.boundingBox[0].x">
+              <input type="number" v-model="child.boundingBox[0].y">
+            </div>
+            <div>
+              <p>bottom right</p>
+              <input type="number" v-model="child.boundingBox[1].x">
+              <input type="number" v-model="child.boundingBox[1].y">
+            </div>
+          </div>-->
+          <div>
+            x:
+            <input type="number" v-model="child.point1.x">
+          </div>
+          <div>
+            y:
+            <input type="number" v-model="child.point1.y">
+          </div>
           <!-- <pre>{{ child }}</pre> -->
         </div>
       </div>
@@ -16,19 +43,25 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { CanvasScreen, ElementType } from "@/libs/element";
+import { mapState, mapGetters, mapMutations } from "vuex";
+import { CanvasElement, ElementType } from "@/libs/element";
 
 export default Vue.extend({
   name: "Properties",
   props: {
-    screenData: CanvasScreen,
     toggled: Boolean
   },
   data() {
     return {};
   },
-  methods: {},
+  methods: {
+    childClicked(child: CanvasElement) {
+      // child.point1.x = 0;
+      // console.log(child);
+    }
+  },
   computed: {
+    ...mapGetters(["screen"]),
     elementTypes() {
       const types = [];
       const typeCount = Object.values(ElementType);
