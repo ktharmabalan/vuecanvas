@@ -3,8 +3,8 @@ import {
   squarePointCollision,
   circlePointCollision,
   pointDistance,
-  boundingPointCollision,
-} from './utils';
+  boundingPointCollision
+} from "./utils";
 
 enum ElementType {
   Square,
@@ -13,7 +13,7 @@ enum ElementType {
   Line,
   Reticle,
   Screen,
-  Select,
+  Select
 }
 
 enum MoveType {
@@ -25,7 +25,7 @@ enum MoveType {
   Down,
   DownLeft,
   Left,
-  UpLeft,
+  UpLeft
 }
 
 const points = [3, 4, 5, 6, 7, 8, 9, 10, 11];
@@ -46,29 +46,40 @@ class Point {
   }
 }
 
-const drawBoundItem = (context: CanvasRenderingContext2D, points: { x: number, y: number }[], offset: { x: number, y: number }) => {
+const drawBoundItem = (
+  context: CanvasRenderingContext2D,
+  points: { x: number; y: number }[],
+  offset: { x: number; y: number }
+) => {
   if (boundType === ElementType.Circle) {
     context.strokeStyle = "#a9a9a9";
     points.forEach(({ x, y }) => {
       context.beginPath();
-      context.arc(x + offset.x, y + offset.y, smallBoxSize / 2, 0, Math.PI * 2, false);
+      context.arc(
+        x + offset.x,
+        y + offset.y,
+        smallBoxSize / 2,
+        0,
+        Math.PI * 2,
+        false
+      );
       context.stroke();
-      context.fillStyle = '#FFF';
+      context.fillStyle = "#FFF";
       // context.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
       context.fill();
-    })
+    });
     // context.closePath();
   } else if (boundType === ElementType.Square) {
     points.forEach(({ x, y }) => {
       context.strokeRect(
-        (x + offset.x) - smallBoxSize / 2,
-        (y + offset.y) - smallBoxSize / 2,
+        x + offset.x - smallBoxSize / 2,
+        y + offset.y - smallBoxSize / 2,
         smallBoxSize,
-        smallBoxSize,
+        smallBoxSize
       );
     });
   }
-}
+};
 
 interface CanvasInterface {
   type: ElementType;
@@ -79,9 +90,9 @@ interface CanvasInterface {
   point1: Point;
   render: (
     context: CanvasRenderingContext2D,
-    offset: { x: number, y: number },
+    offset: { x: number; y: number },
     colliding: CanvasElement[],
-    selecting: CanvasElement[],
+    selecting: CanvasElement[]
   ) => void;
   addChild: (child: CanvasElement) => void;
   removeChild: (child: CanvasElement) => void;
@@ -113,12 +124,12 @@ class CanvasElement implements CanvasInterface {
 
   render(
     context: CanvasRenderingContext2D,
-    offset: { x: number, y: number },
+    offset: { x: number; y: number },
     colliding: CanvasElement[],
-    selecting: CanvasElement[],
+    selecting: CanvasElement[]
   ): void {
     // console.log(`Called from ${ElementType[this.type]}`)
-    this.children.forEach((child) => {
+    this.children.forEach(child => {
       child.render(context, offset, colliding, selecting);
     });
   }
@@ -155,17 +166,20 @@ class CanvasElement implements CanvasInterface {
 
   updatePoint(x: number, y: number) { }
 
-  drawBounding(context: CanvasRenderingContext2D, offset: { x: number, y: number }) {
+  drawBounding(
+    context: CanvasRenderingContext2D,
+    offset: { x: number; y: number }
+  ) {
     const topLeft = { x: this.boundingBox[0].x, y: this.boundingBox[0].y };
     const topRight = { x: this.boundingBox[1].x, y: this.boundingBox[0].y };
     const bottomLeft = { x: this.boundingBox[0].x, y: this.boundingBox[1].y };
     const bottomRight = {
       x: this.boundingBox[1].x,
-      y: this.boundingBox[1].y,
+      y: this.boundingBox[1].y
     };
 
     if (drawMini || drawBoundSquare) {
-      context.strokeStyle = '#2f7cff';
+      context.strokeStyle = "#2f7cff";
       context.lineWidth = 1;
 
       if (drawBoundSquare) {
@@ -173,38 +187,42 @@ class CanvasElement implements CanvasInterface {
           topLeft.x + offset.x,
           topLeft.y + offset.y,
           bottomRight.x - topLeft.x,
-          bottomRight.y - topLeft.y,
+          bottomRight.y - topLeft.y
         );
       }
 
       if (drawMini) {
         const middleLeft = {
           x: this.boundingBox[0].x,
-          y: (this.boundingBox[0].y + this.boundingBox[1].y) / 2,
+          y: (this.boundingBox[0].y + this.boundingBox[1].y) / 2
         };
         const middleRight = {
           x: this.boundingBox[1].x,
-          y: (this.boundingBox[0].y + this.boundingBox[1].y) / 2,
+          y: (this.boundingBox[0].y + this.boundingBox[1].y) / 2
         };
         const topCenter = {
           x: (this.boundingBox[0].x + this.boundingBox[1].x) / 2,
-          y: this.boundingBox[0].y,
+          y: this.boundingBox[0].y
         };
         const bottomCenter = {
           x: (this.boundingBox[0].x + this.boundingBox[1].x) / 2,
-          y: this.boundingBox[1].y,
+          y: this.boundingBox[1].y
         };
 
-        drawBoundItem(context, [
-          { x: topLeft.x, y: topLeft.y },
-          { x: topRight.x, y: topRight.y },
-          { x: bottomLeft.x, y: bottomLeft.y },
-          { x: bottomRight.x, y: bottomRight.y },
-          { x: middleLeft.x, y: middleLeft.y },
-          { x: middleRight.x, y: middleRight.y },
-          { x: topCenter.x, y: topCenter.y },
-          { x: bottomCenter.x, y: bottomCenter.y },
-        ], offset);
+        drawBoundItem(
+          context,
+          [
+            { x: topLeft.x, y: topLeft.y },
+            { x: topRight.x, y: topRight.y },
+            { x: bottomLeft.x, y: bottomLeft.y },
+            { x: bottomRight.x, y: bottomRight.y },
+            { x: middleLeft.x, y: middleLeft.y },
+            { x: middleRight.x, y: middleRight.y },
+            { x: topCenter.x, y: topCenter.y },
+            { x: bottomCenter.x, y: bottomCenter.y }
+          ],
+          offset
+        );
       }
     }
   }
@@ -263,37 +281,44 @@ class PolygonElement extends CanvasElement {
     if (minX && minY && maxX && maxY) {
       this.boundingBox = [
         new Point(point.x + minX, point.y + minY),
-        new Point(point.x + maxX, point.y + maxY),
+        new Point(point.x + maxX, point.y + maxY)
       ];
     }
   }
 
   render(
     context: CanvasRenderingContext2D,
-    offset: { x: number, y: number },
+    offset: { x: number; y: number },
     colliding: CanvasElement[],
-    selecting: CanvasElement[],
+    selecting: CanvasElement[]
   ): void {
     const pointsList = this.pointsList;
     const size = pointsList.length;
 
     context.lineWidth = 3;
-    context.strokeStyle = '#1a1a1a';
+    context.strokeStyle = "#1a1a1a";
 
     context.beginPath();
     // Draw center
-    context.arc(this.point1.x + offset.x, this.point1.y + offset.y, 1, 0, Math.PI * 2, false);
+    context.arc(
+      this.point1.x + offset.x,
+      this.point1.y + offset.y,
+      1,
+      0,
+      Math.PI * 2,
+      false
+    );
 
     // Move to first coordinate
     context.moveTo(
       this.point1.x + pointsList[0].x + offset.x,
-      this.point1.y + pointsList[0].y + offset.y,
+      this.point1.y + pointsList[0].y + offset.y
     );
 
     for (let index = 1; index < size; index++) {
       context.lineTo(
         this.point1.x + pointsList[index].x + offset.x,
-        this.point1.y + pointsList[index].y + offset.y,
+        this.point1.y + pointsList[index].y + offset.y
       );
     }
 
@@ -345,7 +370,7 @@ class PolygonElement extends CanvasElement {
     if (minX && minY && maxX && maxY) {
       this.boundingBox = [
         new Point(this.point1.x + minX, this.point1.y + minY),
-        new Point(this.point1.x + maxX, this.point1.y + maxY),
+        new Point(this.point1.x + maxX, this.point1.y + maxY)
       ];
     }
   }
@@ -405,7 +430,6 @@ class PolygonElement extends CanvasElement {
   //       }
   //     }
 
-
   //     // let collided = false;
   //     // let point = this.point1;
   //     // collided = pointDistance(target as Point, point) < (smallBoxSize / 2);
@@ -431,7 +455,7 @@ class BaseSquareElement extends CanvasElement {
     type: ElementType,
     point: Point,
     minWidth: number,
-    minHeight: number,
+    minHeight: number
   ) {
     super(type, point);
     this.minWidth = minWidth;
@@ -459,7 +483,7 @@ class BaseSquareElement extends CanvasElement {
 
     this.boundingBox = [
       this.point1,
-      new Point(this.point1.x + minWidth, this.point1.y + minHeight),
+      new Point(this.point1.x + minWidth, this.point1.y + minHeight)
     ];
   }
 
@@ -473,7 +497,7 @@ class BaseSquareElement extends CanvasElement {
 
     this.boundingBox = [
       this.point1,
-      new Point(this.point1.x + this.minWidth, this.point1.y + this.minHeight),
+      new Point(this.point1.x + this.minWidth, this.point1.y + this.minHeight)
     ];
   }
 
@@ -486,15 +510,15 @@ class BaseSquareElement extends CanvasElement {
     // this.minHeight = _y + this.minHeight;
     this.boundingBox = [
       this.point1,
-      new Point(_x + this.minWidth, _y + this.minHeight),
+      new Point(_x + this.minWidth, _y + this.minHeight)
     ];
   }
 
   render(
     context: CanvasRenderingContext2D,
-    offset: { x: number, y: number },
+    offset: { x: number; y: number },
     colliding: CanvasElement[],
-    selecting: CanvasElement[],
+    selecting: CanvasElement[]
   ): void {
     super.render(context, offset, colliding, selecting);
   }
@@ -503,19 +527,19 @@ class BaseSquareElement extends CanvasElement {
 class SquareElement extends BaseSquareElement {
   render(
     context: CanvasRenderingContext2D,
-    offset: { x: number, y: number },
+    offset: { x: number; y: number },
     colliding: CanvasElement[],
-    selecting: CanvasElement[],
+    selecting: CanvasElement[]
   ): void {
     context.lineWidth = 3;
-    context.strokeStyle = '#1a1a1a';
-    context.fillStyle = 'rgba(255, 255, 255, 0)';
+    context.strokeStyle = "#1a1a1a";
+    context.fillStyle = "rgba(255, 255, 255, 0)";
 
     context.strokeRect(
       this.point1.x + offset.x,
       this.point1.y + offset.y,
       this.minWidth,
-      this.minHeight,
+      this.minHeight
     );
 
     // context.fillRect(
@@ -538,30 +562,30 @@ class SquareElement extends BaseSquareElement {
 class SelectSquareElement extends BaseSquareElement {
   render(
     context: CanvasRenderingContext2D,
-    offset: { x: number, y: number },
+    offset: { x: number; y: number },
     colliding: CanvasElement[],
-    selecting: CanvasElement[],
+    selecting: CanvasElement[]
   ): void {
     context.lineWidth = 1;
     // context.strokeStyle = 'white';
     // context.strokeStyle = 'rgba(121, 169, 250, 1)';
-    context.strokeStyle = 'rgba(21, 69, 250, 1)';
+    context.strokeStyle = "rgba(21, 69, 250, 1)";
     // context.fillStyle = 'rgba(255, 255, 255, .2)';
     // context.fillStyle = 'rgba(202, 218, 245, .5)';
     // context.fillStyle = 'rgba(163, 194, 247, .5)';
-    context.fillStyle = 'rgba(121, 169, 250, .5)';
+    context.fillStyle = "rgba(121, 169, 250, .5)";
 
     context.fillRect(
       this.point1.x,
       this.point1.y,
       this.minWidth,
-      this.minHeight,
+      this.minHeight
     );
     context.strokeRect(
       this.point1.x,
       this.point1.y,
       this.minWidth,
-      this.minHeight,
+      this.minHeight
     );
 
     super.render(context, offset, colliding, selecting);
@@ -571,18 +595,18 @@ class SelectSquareElement extends BaseSquareElement {
 class CanvasScreen extends BaseSquareElement {
   render(
     context: CanvasRenderingContext2D,
-    offset: { x: number, y: number },
+    offset: { x: number; y: number },
     colliding: CanvasElement[],
-    selecting: CanvasElement[],
+    selecting: CanvasElement[]
   ): void {
     // context.lineWidth = 1;
     // context.strokeStyle = 'black';
-    context.fillStyle = 'rgba(242, 242, 242, 1)';
+    context.fillStyle = "rgba(242, 242, 242, 1)";
     context.fillRect(
       this.point1.x,
       this.point1.y,
       this.minWidth,
-      this.minHeight,
+      this.minHeight
     );
 
     // if (this.isColliding) {
@@ -598,28 +622,43 @@ class CanvasScreen extends BaseSquareElement {
 
 class LineElement extends CanvasElement {
   points: Point[];
+  pointOffset: number = 5;
 
   constructor(type: ElementType, point1: Point) {
     super(type, point1);
     this.points = [];
+    let minX = point1.x;
+    let minY = point1.y;
+    let maxX = point1.x;
+    let maxY = point1.y;
+
+    if (minX && minY && maxX && maxY) {
+      this.boundingBox = [
+        new Point(minX - this.pointOffset, minY - this.pointOffset),
+        new Point(maxX + this.pointOffset, maxY + this.pointOffset)
+      ];
+    }
   }
 
-  drawBounding(context: CanvasRenderingContext2D, offset: { x: number, y: number }) {
+  drawBounding(
+    context: CanvasRenderingContext2D,
+    offset: { x: number; y: number }
+  ) {
     if (drawMini) {
-      const bounds: ({ x: number, y: number })[] = [];
+      const bounds: ({ x: number; y: number })[] = [];
       bounds.push({ x: this.point1.x, y: this.point1.y });
-      this.points.forEach((point) => bounds.push({ x: point.x, y: point.y }));
+      this.points.forEach(point => bounds.push({ x: point.x, y: point.y }));
       drawBoundItem(context, bounds, offset);
     }
   }
 
   render(
     context: CanvasRenderingContext2D,
-    offset: { x: number, y: number },
+    offset: { x: number; y: number },
     colliding: CanvasElement[],
-    selecting: CanvasElement[],
+    selecting: CanvasElement[]
   ): void {
-    context.strokeStyle = '#1a1a1a';
+    context.strokeStyle = "#1a1a1a";
     context.lineWidth = 3;
     // if (colliding.includes(this)) {
     //   context.strokeStyle = 'white';
@@ -628,7 +667,7 @@ class LineElement extends CanvasElement {
 
     context.beginPath();
     context.moveTo(this.point1.x, this.point1.y);
-    this.points.forEach((point) => {
+    this.points.forEach(point => {
       context.lineTo(point.x, point.y);
     });
     context.stroke();
@@ -643,17 +682,43 @@ class LineElement extends CanvasElement {
 
   addPoint(point: Point) {
     this.points.push(point);
+
+    let minX = this.point1.x;
+    let minY = this.point1.y;
+    let maxX = this.point1.x;
+    let maxY = this.point1.y;
+
+    this.points.forEach((point: Point) => {
+      if (minX === null || point.x < minX) minX = point.x;
+      if (maxX === null || point.x > maxX) maxX = point.x;
+      if (minY === null || point.y < minY) minY = point.y;
+      if (maxY === null || point.y > maxY) maxY = point.y;
+    });
+
+    // if (minX !== null && maxX !== null && minY !== null && maxY !== null) {
+    //   width = maxX - minX;
+    //   height = maxY - minY;
+    // }
+
+    if (minX && minY && maxX && maxY) {
+      this.boundingBox = [
+        new Point(minX - this.pointOffset, minY - this.pointOffset),
+        new Point(maxX + this.pointOffset, maxY + this.pointOffset)
+        // new Point(minX, minY),
+        // new Point(maxX, maxY)
+      ];
+    }
   }
 
   checkCollision(target: Point | CanvasElement): Boolean {
     // console.log(target, this);
     let collided = false;
     let point = this.point1;
-    collided = pointDistance(target as Point, point) < (smallBoxSize / 2);
+    collided = pointDistance(target as Point, point) < smallBoxSize / 2;
     if (!collided) {
       for (let index = 0; index < this.points.length; index++) {
         point = this.points[index];
-        collided = pointDistance(target as Point, point) < (smallBoxSize / 2);
+        collided = pointDistance(target as Point, point) < smallBoxSize / 2;
         if (collided) {
           break;
         }
@@ -680,7 +745,7 @@ class CircleElement extends CanvasElement {
 
     this.boundingBox = [
       new Point(this.point1.x - radius, this.point1.y - radius),
-      new Point(this.point1.x + radius, this.point1.y + radius),
+      new Point(this.point1.x + radius, this.point1.y + radius)
     ];
   }
 
@@ -692,7 +757,7 @@ class CircleElement extends CanvasElement {
 
     this.boundingBox = [
       new Point(_x - this.radius, _y - this.radius),
-      new Point(_x + this.radius, _y + this.radius),
+      new Point(_x + this.radius, _y + this.radius)
     ];
   }
 
@@ -706,12 +771,12 @@ class CircleElement extends CanvasElement {
 
   render(
     context: CanvasRenderingContext2D,
-    offset: { x: number, y: number },
+    offset: { x: number; y: number },
     colliding: CanvasElement[],
-    selecting: CanvasElement[],
+    selecting: CanvasElement[]
   ): void {
     context.lineWidth = 3;
-    context.strokeStyle = '#1a1a1a';
+    context.strokeStyle = "#1a1a1a";
 
     context.beginPath();
     context.arc(
@@ -720,9 +785,9 @@ class CircleElement extends CanvasElement {
       this.radius,
       0,
       Math.PI * 2,
-      false,
+      false
     );
-    context.closePath()
+    context.closePath();
     context.stroke();
 
     // context.fillStyle = 'white';
@@ -742,18 +807,18 @@ class ReticleElement extends CanvasElement {
   }
 
   updatePoint(x: number, y: number): void {
-    this.children.forEach((child) => {
+    this.children.forEach(child => {
       (<LineElement>child).updatePoint(x, y);
     });
   }
 
   render(
     context: CanvasRenderingContext2D,
-    offset: { x: number, y: number },
+    offset: { x: number; y: number },
     colliding: CanvasElement[],
-    selecting: CanvasElement[],
+    selecting: CanvasElement[]
   ): void {
-    context.strokeStyle = 'white';
+    context.strokeStyle = "white";
     super.render(context, offset, colliding, selecting);
   }
 }
@@ -810,7 +875,7 @@ const collisionCheck = (
         selectTop,
         top,
         clickPoint,
-        selecting,
+        selecting
       );
       colliding = colliding.concat(colliding1);
       selecting = selecting.concat(selecting1);
@@ -836,7 +901,7 @@ const collisionCheck = (
 
 const collisionOnlyCheck = (
   element: CanvasElement,
-  clickPoint: Point,
+  clickPoint: Point
 ): [CanvasElement, number, number] | null => {
   const children = element.children;
   const childrenCount = children.length;
@@ -866,7 +931,9 @@ const collisionOnlyCheck = (
   return colliding;
 };
 
-const drawBoundingBox = (selecting: CanvasElement[]): SelectSquareElement | null => {
+const drawBoundingBox = (
+  selecting: CanvasElement[]
+): SelectSquareElement | null => {
   if (selecting.length) {
     // console.log('inside');
     let minX: number | null = null;
@@ -877,7 +944,7 @@ const drawBoundingBox = (selecting: CanvasElement[]): SelectSquareElement | null
     let width = 0;
     let height = 0;
 
-    selecting.forEach((element) => {
+    selecting.forEach(element => {
       if (![ElementType.Screen, ElementType.Select].includes(element.type)) {
         const child = element;
         const [point1, point2] = child.boundingBox;
@@ -902,7 +969,7 @@ const drawBoundingBox = (selecting: CanvasElement[]): SelectSquareElement | null
       ElementType.Square,
       new Point(minX!, minY!),
       width,
-      height,
+      height
     );
   }
   return null;

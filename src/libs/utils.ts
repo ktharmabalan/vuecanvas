@@ -1,9 +1,5 @@
 // Reference: https://www.youtube.com/channel/UCF6F8LdCSWlRwQm_hfA2bcQ
-import {
-  CircleElement,
-  Point,
-  SquareElement,
-} from './element';
+import { CircleElement, Point, SquareElement } from "./element";
 
 // take value within min-max range, and represent its position by a number between 0 and 1
 const normalize = (value: number, min: number, max: number) => {
@@ -22,7 +18,7 @@ const map = (
   sourceMin: number,
   sourceMax: number,
   destMin: number,
-  destMax: number,
+  destMax: number
 ) => {
   return lerp(normalize(value, sourceMin, sourceMax), destMin, destMax);
 };
@@ -52,10 +48,7 @@ const pointDistance = (p1: Point, p2: Point) => {
 // }
 
 // caculate distance between two points
-const circleDistance = (
-  d1: CircleElement,
-  d2: CircleElement,
-): number => {
+const circleDistance = (d1: CircleElement, d2: CircleElement): number => {
   const dx = d1.point1.x - d2.point1.x;
   const dy = d1.point1.y - d2.point1.y;
   return Math.sqrt(dx * dx + dy * dy);
@@ -65,60 +58,33 @@ const rangeIntersect = (
   min1: number,
   min2: number,
   max1: number,
-  max2: number,
+  max2: number
 ): boolean => {
   return (
-    Math.max(min1, max1) >=
-    Math.min(min2, max2) &&
-    Math.min(min1, max1) <=
-    Math.max(min2, max2)
+    Math.max(min1, max1) >= Math.min(min2, max2) &&
+    Math.min(min1, max1) <= Math.max(min2, max2)
   );
 };
 
-const circleCollision = (
-  c1: CircleElement,
-  c2: CircleElement,
-): boolean => {
+const circleCollision = (c1: CircleElement, c2: CircleElement): boolean => {
   return circleDistance(c1, c2) <= c1.radius + c2.radius;
 };
 
-const circlePointCollision = (
-  point: Point,
-  circle: CircleElement,
-): boolean => {
+const circlePointCollision = (point: Point, circle: CircleElement): boolean => {
   return pointDistance(point, circle.point1) < circle.radius;
 };
 
-const squarePointCollision = (
-  point: Point,
-  square: SquareElement
-): boolean => {
+const squarePointCollision = (point: Point, square: SquareElement): boolean => {
   return (
-    inRange(
-      point.x,
-      square.point1.x,
-      square.point1.x + square.minWidth
-    ) &&
-    inRange(
-      point.y,
-      square.point1.y,
-      square.point1.y + square.minHeight
-    )
+    inRange(point.x, square.point1.x, square.point1.x + square.minWidth) &&
+    inRange(point.y, square.point1.y, square.point1.y + square.minHeight)
   );
 };
 
 const boundingPointCollision = (point: Point, square: Point[]): boolean => {
   return (
-    inRange(
-      point.x,
-      square[0].x,
-      square[1].x
-    ) &&
-    inRange(
-      point.y,
-      square[0].y,
-      square[1].y
-    )
+    inRange(point.x, square[0].x, square[1].x) &&
+    inRange(point.y, square[0].y, square[1].y)
   );
 };
 

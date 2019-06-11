@@ -10,17 +10,22 @@ class Zoom {
   dox: number = 0;
   doy: number = 0;
   dscale: number = 0;
-  step: number = .5;
-  speed: number = .5;
+  step: number = 0.5;
+  speed: number = 0.5;
   mX: number = 0;
   mY: number = 0;
   xScale: number = 0;
   yScale: number = 0;
 
-  constructor() {
-  }
+  constructor() {}
 
-  update(context: CanvasRenderingContext2D, mouseX: number, mouseY: number, oMouseX: number, oMouseY: number) {
+  update(
+    context: CanvasRenderingContext2D,
+    mouseX: number,
+    mouseY: number,
+    oMouseX: number,
+    oMouseY: number
+  ) {
     this.dx += (this.x - this.step) * this.speed;
     this.dy += (this.y - this.step) * this.speed;
     this.dox += (this.ox - this.step) * this.speed;
@@ -39,6 +44,4 @@ class Zoom {
   }
 }
 
-export {
-  Zoom,
-};
+export { Zoom };

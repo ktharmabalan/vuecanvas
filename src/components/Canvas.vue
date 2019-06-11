@@ -175,7 +175,7 @@ export default Vue.extend({
 
       this.selectRect = null;
 
-      if (!this.keyPressed.includes(this.keyMap.shift)) {
+      if (!this.keyPressed.includes(this.keyMap.shift) && !(this.selecting.length === 1 && this.selecting[0].type === ElementType.Line)) {
         this.selecting = [];
       } else {
         this.drawPoint = new Point(x, y);
@@ -521,8 +521,7 @@ export default Vue.extend({
             maxY = this.selectRect!.point1.y;
           }
 
-          this.screen.children.forEach(_child => {
-            const child = <CanvasElement>_child;
+          this.screen.children.forEach((child: CanvasElement) => {
             if (child.boundingBox.length) {
               let cMinX = child!.boundingBox[0].x;
               let cMinY = child!.boundingBox[0].y;
@@ -569,6 +568,10 @@ export default Vue.extend({
         // insert element
         if (this.insertElement && this.mouseDownPoint) {
           this.insertElementToScreen();
+        }
+
+        if (this.selecting.length === 1 && this.selecting[0].type === ElementType.Line && this.drawPoint) {
+          (this.selecting[0] as LineElement).addPoint(this.drawPoint);
         }
 
         // if (maxDepth !== 0) {
@@ -682,9 +685,13 @@ export default Vue.extend({
             new Point(this.mouseDownPoint.x, this.mouseDownPoint.y)
           );
           this.screen.addChild(line);
-          line.addPoint(
-            new Point(this.mouseDownPoint.x + 100, this.mouseDownPoint.y)
-          );
+          // line.addPoint(
+          //   new Point(this.mouseDownPoint.x + 100, this.mouseDownPoint.y)
+          // );
+          // line.addPoint(
+          //   new Point(this.mouseDownPoint.x + 200, this.mouseDownPoint.y + 100)
+          // );
+          // this.selecting.push(line);
         }
       }
     }

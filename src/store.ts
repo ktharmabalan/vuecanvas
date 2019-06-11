@@ -1,10 +1,16 @@
 import Vue from "vue";
-import Vuex from "vuex";
+import Vuex, { StoreOptions } from "vuex";
+import { CanvasScreen } from "@/libs/element";
+
+interface ScreenState {
+  screen: CanvasScreen | null;
+}
+
 Vue.use(Vuex);
 
-const store = {
+const store: StoreOptions<ScreenState> = {
   state: {
-    screen: null,
+    screen: null
   },
   getters: {
     screen: state => state.screen
@@ -13,7 +19,7 @@ const store = {
     setScreen(state, screen) {
       state.screen = screen;
     }
-  },
+  }
 };
 
 export default new Vuex.Store(store);

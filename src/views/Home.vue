@@ -10,8 +10,8 @@
       <span class="toggler" @click="toggle()">T</span>
     </div>
 
-    <Properties :toggled="toggled" @toggle="toggle" :screen-data="screenData"/>
-    <ElementMenu @select-element="selectElement" :selected="insertElement"/>
+    <Properties :toggled="toggled" @toggle="toggle" :screen-data="screenData" />
+    <ElementMenu @select-element="selectElement" :selected="insertElement" />
   </div>
 </template>
 

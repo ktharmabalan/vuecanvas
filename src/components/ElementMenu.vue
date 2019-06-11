@@ -5,7 +5,8 @@
       :key="eId"
       :class="{ active: selected === element }"
       @click="$emit('select-element', element)"
-    >{{ element.substring(0, 1).toUpperCase() }}</span>
+      >{{ element.substring(0, 1).toUpperCase() }}
+    </span>
   </div>
 </template>
 
