@@ -80,7 +80,7 @@ export default Vue.extend({
       translateX: 0,
       translateY: 0,
       zoom: 0,
-      zoomRange: { min: 1, max: 4 }
+      zoomRange: { min: 1, max: 5 }
     };
   },
   mounted() {
@@ -135,24 +135,22 @@ export default Vue.extend({
         )
       );
 
-      // console.log(this.screen);
-
-      // Polygon
-      this.screen.addChild(
-        new PolygonElement(
-          ElementType.Polygon,
-          new Point(this.screen.point1.x + 500, this.screen.point1.x + 500),
-          20
-        )
-      );
+      // // Polygon
+      // this.screen.addChild(
+      //   new PolygonElement(
+      //     ElementType.Polygon,
+      //     new Point(this.screen.point1.x + 500, this.screen.point1.x + 500),
+      //     20
+      //   )
+      // );
 
       this.screen.addChild(
-        new SquareElement(ElementType.Square, new Point(700, 400), 200, 200)
+        new SquareElement(ElementType.Square, new Point(0, 0), 200, 200)
       );
 
-      this.screen.addChild(
-        new CircleElement(ElementType.Circle, new Point(300, 400), 100)
-      );
+      // this.screen.addChild(
+      //   new CircleElement(ElementType.Circle, new Point(300, 400), 100)
+      // );
 
       this.render();
     },
@@ -310,12 +308,12 @@ export default Vue.extend({
       if (deltaY < 0) {
         // zoomin
         if (this.zoom < this.zoomRange.max) {
-          this.newZoom += 1;
+          this.newZoom += .1;
         }
       } else {
         // zoom in
         if (this.zoom > this.zoomRange.min) {
-          this.newZoom -= 1;
+          this.newZoom -= .1;
         }
       }
     },
@@ -349,31 +347,46 @@ export default Vue.extend({
     },
     render() {
       if (this.screen && this.context) {
-        // this.context.setTransform(1, 0, 0, 1, 0, 0);
-        // if (this.zoom !== this.newZoom) {
-        //   const zoom = Math.max(1, this.newZoom);
-        //   this.zoom = zoom;
-        //   this.newZoom = zoom;
-        //   // this.translateX
-        //   this.context.setTransform(zoom, 0, 0, zoom, 0, 0);
+        const transform = true;
+        // const x = 0;
+        // const y = 0;
+        // const scale = 2;
 
-        //   // this.context.scale(
-        //   //   2,
-        //   //   2
-        //   //   // Math.max(1, zoom),
-        //   //   // Math.max(1, zoom)
-        //   //   // this.zoom,
-        //   //   // this.zoom
-        //   //   // 1 + this.zoom / this.zoomRange.max,
-        //   //   // 1 + this.zoom / this.zoomRange.max
-        //   // );
-        //   // this.context.translate(
-        //   //   this.screenWidth / 4,
-        //   //   this.screenHeight / 4
-        //   //   // this.screenWidth / zoom,
-        //   //   // this.screenHeight / zoom
-        //   // );
+        // if (transform) {
+        //   this.context.setTransform(scale, 0, 0, scale, 0, 0);
+        //   // width: 1483px; height: 977px;
+        //   this.context.translate(
+        //     x,
+        //     y,
+        //     // -((this.screenWidth / 2 * scale) - (x+200)/2),
+        //     // -((this.screenHeight / 2 * scale) - (y+200)/2),
+        //   );
+        //   this.screen.addChild(
+        //     new SquareElement(ElementType.Square, new Point(x, y), 200, 200)
+        //   );
         // }
+
+        if (this.zoom !== this.newZoom) {
+          console.log(this.zoom);
+          this.offset.x = this.zoom;
+          this.offset.y = this.zoom;
+          const zoom = Math.max(1, this.newZoom);
+          this.zoom = zoom;
+          this.newZoom = zoom;
+          // this.context.translate(
+          //   -(this.screenWidth / (2* zoom)) - this.mouseX,
+          //   -(this.screenHeight / (2* zoom)) - this.mouseY
+          // );
+          this.context.translate(
+            this.zoom,
+            this.zoom,
+            // (this.screenWidth / (2* zoom)) - this.mouseX,
+            // (this.screenHeight / (2* zoom)) - this.mouseY
+          );
+
+          this.context.setTransform(zoom, 0, 0, zoom, 0, 0);
+          this.context.translate(0, 0);
+        }
 
         const point = new Point(this.mouseX, this.mouseY);
         // if (mouseDownPoint !== null) {

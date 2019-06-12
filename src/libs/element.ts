@@ -1,3 +1,4 @@
+// https://www.html5rocks.com/en/tutorials/canvas/performance/
 // https://github.com/webtunings/canvas-examples
 import {
   squarePointCollision,
@@ -533,9 +534,10 @@ class SquareElement extends BaseSquareElement {
   ): void {
     context.lineWidth = 3;
     context.strokeStyle = "#1a1a1a";
-    context.fillStyle = "rgba(255, 255, 255, 0)";
+    context.fillStyle = "rgba(255, 255, 255, 1)";
 
     context.strokeRect(
+      // context.fillRect(
       this.point1.x + offset.x,
       this.point1.y + offset.y,
       this.minWidth,
@@ -602,7 +604,7 @@ class CanvasScreen extends BaseSquareElement {
     // context.lineWidth = 1;
     // context.strokeStyle = 'black';
     context.fillStyle = "rgba(242, 242, 242, 1)";
-    context.fillRect(
+    context.clearRect(
       this.point1.x,
       this.point1.y,
       this.minWidth,
