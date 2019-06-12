@@ -1,5 +1,8 @@
 // https://www.html5rocks.com/en/tutorials/canvas/performance/
+// https://gist.github.com/dzhang123/2a3a611b3d75a45a3f41
 // https://github.com/webtunings/canvas-examples
+// https://stackoverflow.com/questions/33925012/how-to-pan-the-canvas
+// https://stackoverflow.com/questions/5189968/zoom-canvas-to-mouse-cursor
 import {
   squarePointCollision,
   circlePointCollision,
